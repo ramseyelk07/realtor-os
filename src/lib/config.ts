@@ -7,7 +7,7 @@
 export interface AppConfig {
   /** Active industry template id (see lib/industries). */
   industryId: string;
-  /** Which CRM provider to use: builtin | close | hubspot | salesforce | pipedrive. */
+  /** Which CRM provider to use: builtin | followupboss | close | hubspot | salesforce | pipedrive. */
   providerId: string;
   orgName: string;
   /** Monthly revenue quota, used for goal attainment. */

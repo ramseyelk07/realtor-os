@@ -115,11 +115,22 @@ export const CONNECTION_SPECS: ProviderSpec[] = [
   // ——— CRMs: connect the org's own CRM as the workspace data source. Stored
   // per-org (secrets encrypted); resolveProvider() activates it for the tenant.
   {
+    provider: "followupboss",
+    kind: "crm",
+    label: "Follow Up Boss",
+    blurb: "Your Follow Up Boss API key (Follow Up Boss → Admin → API). Leads, stages, and activity sync; everything we send is logged on the lead's FUB timeline.",
+    fields: [{ key: "apiKey", label: "API key", secret: true, required: true, placeholder: "fka_…" }],
+  },
+  {
     provider: "close",
     kind: "crm",
     label: "Close",
     blurb: "Your Close API key (Settings → API Keys in Close). Leads, deals, and activity sync both ways.",
-    fields: [{ key: "apiKey", label: "API key", secret: true, required: true, placeholder: "api_…" }],
+    fields: [
+      { key: "apiKey", label: "API key", secret: true, required: true, placeholder: "api_…" },
+      { key: "smsFrom", label: "Text from this Close number (optional)", secret: false, required: false, placeholder: "+19515550123", help: "An A2P-registered number in your Close account. Set it to send texts through Close; leave blank to let Close pick your default number." },
+      { key: "smsEnabled", label: "Send texts through Close (true/false)", secret: false, required: false, placeholder: "true", help: "Set to true to send this workspace's texts from your Close number instead of the platform number." },
+    ],
   },
   {
     provider: "hubspot",

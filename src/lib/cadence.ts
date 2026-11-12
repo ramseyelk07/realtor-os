@@ -549,7 +549,7 @@ export async function runDueSteps(now: string = new Date().toISOString()): Promi
         res =
           step.channel === "email"
             ? await sendEmail(address, draft.subject ?? "", trackLinks(draft.body, { orgId: org.id, contactId: e.contactId, dealId: e.dealId, channel: "email" }), { unsubscribeUrl: await unsubscribeUrl(e.contactId), compliance: { orgName: org.compliance.senderName ?? org.name, address: org.compliance.address } })
-            : await sendSms(address, trackLinks(draft.body, { orgId: org.id, contactId: e.contactId, dealId: e.dealId, channel: "sms" }), { from: org.callerId });
+            : await sendSms(address, trackLinks(draft.body, { orgId: org.id, contactId: e.contactId, dealId: e.dealId, channel: "sms" }), { from: org.callerId, contactId: e.contactId });
       } catch {
         res = { status: "failed" };
       }

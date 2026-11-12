@@ -318,7 +318,7 @@ export async function runTask(task: AgentTask): Promise<AgentRun> {
                   unsubscribeUrl: await unsubscribeUrl(t.opp.contactId),
                   compliance: { orgName: org.compliance.senderName ?? org.name, address: org.compliance.address },
                 })
-              : await sendSms(to, tracked, { from: org.callerId });
+              : await sendSms(to, tracked, { from: org.callerId, contactId: t.opp.contactId });
           result = sendOutcome(res.status);
           if (result !== "skipped") {
             sent += 1;

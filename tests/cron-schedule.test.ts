@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 /**
@@ -21,8 +21,13 @@ describe("autopilot cron schedule", () => {
   it("runs at least hourly, never just once a day", () => {
     const cron = cfg.crons?.find((c) => c.path === "/api/agent/cron");
     const hourField = cron!.schedule.trim().split(/\s+/)[1]; // min hour dom mon dow
-    // "*" (every hour) or a list/range/step is fine; a single fixed hour is NOT.
+    // "*" (every hour) or a list/range/step is fine; a single fixed hour is NOT —
+    // unless the hourly tick comes from the GitHub Actions fallback (Vercel Hobby
+    // rejects sub-daily crons, so those deployments keep a daily Vercel cron and
+    // tick hourly through .github/workflows/autopilot.yml instead).
     const isSingleFixedHour = /^\d+$/.test(hourField);
-    expect(isSingleFixedHour, `cron hour "${hourField}" runs once a day — the agent would skip everyone in quiet hours`).toBe(false);
+    const workflow = join(process.cwd(), ".github/workflows/autopilot.yml");
+    const hourlyFallback = existsSync(workflow) && /cron:\s*"0 \* \* \* \*"/.test(readFileSync(workflow, "utf8"));
+    expect(isSingleFixedHour && !hourlyFallback, `cron hour "${hourField}" runs once a day — the agent would skip everyone in quiet hours`).toBe(false);
   });
 });

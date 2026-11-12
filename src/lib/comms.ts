@@ -305,9 +305,20 @@ export async function sendEmail(
   return t ? t.send({ to, subject, body: compliant, html }) : logResult();
 }
 
-export async function sendSms(to: string, body: string, opts: { from?: string } = {}): Promise<SendResult> {
-  const t = resolveSms();
+export async function sendSms(to: string, body: string, opts: { from?: string; contactId?: string } = {}): Promise<SendResult> {
   const compliant = appendSmsCompliance(body);
+  // A workspace that opted in to texting through its own Close account sends
+  // from its Close number (no Twilio needed). Falls through to the normal
+  // transports whenever Close can't take this message.
+  if (opts.contactId && !customSms) {
+    const { closeSmsConfig, sendViaClose } = await import("@/lib/channels/close-sms");
+    const cfg = await closeSmsConfig();
+    if (cfg) {
+      const r = await sendViaClose(cfg, { to, body: compliant, contactId: opts.contactId });
+      if (r) return r;
+    }
+  }
+  const t = resolveSms();
   return t ? t.send({ to, body: compliant, from: opts.from }) : logResult();
 }
 

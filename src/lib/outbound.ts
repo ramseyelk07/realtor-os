@@ -83,7 +83,7 @@ export async function sendReply(reply: OutboundReply): Promise<OutboundResult> {
   if (channel === "sms") {
     // Text from this org's own caller-ID number (falls back inside sendSms).
     const from = (await getOrgSettings().catch(() => null))?.callerId;
-    const r = await sendSms(address, body, { from });
+    const r = await sendSms(address, body, { from, contactId: contact.id });
     return { status: r.status, provider: r.provider, id: r.id, detail: r.detail };
   }
 

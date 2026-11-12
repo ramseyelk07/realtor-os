@@ -94,6 +94,11 @@ async function runForCurrentOrg() {
       await releaseCronLock(lockKey, fence);
     }
   }
+  // Texts the org's own Close account received since the last tick (opt-in;
+  // no-op unless the org connected Close with "Send texts through Close").
+  const closeSms = await import("@/lib/channels/close-sms")
+    .then((m) => m.pollCloseInboundSms())
+    .catch((e) => ({ error: e instanceof Error ? e.message : "close sms poll failed" }));
   const cadence = await runDueSteps().catch((e) => ({ error: e instanceof Error ? e.message : "cadence failed" }));
   // Execute due call retries (self-gated: only orgs with an enabled auto call
   // task; quiet hours / opt-outs / attempt budget enforced inside).
@@ -123,10 +128,10 @@ async function runForCurrentOrg() {
   const usageNudge = await runUsageNudge().catch((e) => ({ error: e instanceof Error ? e.message : "usage nudge failed" }));
   // Surface engine errors to the operator — an autonomous tick that silently
   // errors every run would otherwise go unnoticed.
-  for (const [stage, result] of Object.entries({ cadence, batches, digests, callRetries, reminders, idleRules, usageNudge })) {
+  for (const [stage, result] of Object.entries({ closeSms, cadence, batches, digests, callRetries, reminders, idleRules, usageNudge })) {
     if (isErrored(result)) await sendAlert(`cron.${stage}`, { error: result.error });
   }
-  return { ran: results.length, results, autopilotLocked: !fence, cadence, batches, digests, callRetries, reminders, idleRules, usageNudge };
+  return { ran: results.length, results, autopilotLocked: !fence, closeSms, cadence, batches, digests, callRetries, reminders, idleRules, usageNudge };
 }
 
 /** Fan out: process every org in its own authenticated sub-request so each gets

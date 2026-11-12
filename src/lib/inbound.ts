@@ -273,7 +273,7 @@ export async function handleInbound(channel: "email" | "sms", from: string, body
     // Only auto-send a real, non-empty body (the drafter already falls back to a
     // template, so this is a final belt-and-suspenders guard before a live send).
     if (to && reply.body.trim()) {
-      const res = channel === "email" ? await sendEmail(to, reply.subject ?? "", reply.body, { unsubscribeUrl: await unsubscribeUrl(contact.id), compliance: { orgName: org.compliance.senderName ?? org.name, address: org.compliance.address } }) : await sendSms(to, reply.body, { from: org.callerId });
+      const res = channel === "email" ? await sendEmail(to, reply.subject ?? "", reply.body, { unsubscribeUrl: await unsubscribeUrl(contact.id), compliance: { orgName: org.compliance.senderName ?? org.name, address: org.compliance.address } }) : await sendSms(to, reply.body, { from: org.callerId, contactId: contact.id });
       if (res.status !== "failed") {
         await provider.logActivity({
           opportunityId: deal?.id,

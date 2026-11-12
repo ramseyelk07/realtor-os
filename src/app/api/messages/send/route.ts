@@ -131,7 +131,7 @@ export const POST = withGuard(async (req: Request) => {
           unsubscribeUrl: contactId ? await unsubscribeUrl(contactId) : null,
           compliance: { orgName: orgForSend?.compliance?.senderName ?? orgForSend?.name, address: orgForSend?.compliance?.address },
         })
-      : await sendSms(to, tracked, { from });
+      : await sendSms(to, tracked, { from, contactId: contactId ?? undefined });
   if (result.status === "failed") {
     return NextResponse.json({ error: result.detail ?? "Send failed", provider: result.provider }, { status: 502 });
   }

@@ -359,7 +359,7 @@ export default async function SettingsPage(
       <div className="mt-6 border-t border-border pt-5">
         <h2 className="font-semibold text-fg">Connect your CRM</h2>
         <p className="mt-1 text-sm text-muted">
-          Already live on Close, HubSpot, Pipedrive, or Salesforce? Connect it with your own credentials
+          Already live on Follow Up Boss, Close, HubSpot, Pipedrive, or Salesforce? Connect it with your own credentials
           (encrypted at rest) and this workspace reads and writes your CRM directly — no migration.
         </p>
         <div className="mt-4">

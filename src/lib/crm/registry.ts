@@ -2,6 +2,7 @@ import type { CrmProvider, ProviderInfo } from "@/lib/crm/types";
 import { BuiltinProvider } from "@/lib/crm/providers/builtin";
 import { SupabaseProvider } from "@/lib/crm/providers/supabase";
 import { CloseProvider } from "@/lib/crm/providers/close";
+import { FollowUpBossProvider } from "@/lib/crm/providers/followupboss";
 import { HubspotProvider } from "@/lib/crm/providers/hubspot";
 import { PipedriveProvider } from "@/lib/crm/providers/pipedrive";
 import { SalesforceProvider } from "@/lib/crm/providers/salesforce";
@@ -26,6 +27,8 @@ function build(id: string): CrmProvider {
       return new SupabaseProvider();
     case "close":
       return new CloseProvider();
+    case "followupboss":
+      return new FollowUpBossProvider();
     case "http":
       return new HttpCrmProvider();
     case "database":
@@ -50,6 +53,7 @@ function build(id: string): CrmProvider {
         if (process.env.PIPEDRIVE_API_TOKEN) return new PipedriveProvider();
         if ((process.env.SALESFORCE_ACCESS_TOKEN && process.env.SALESFORCE_INSTANCE_URL) || (process.env.SALESFORCE_REFRESH_TOKEN && process.env.SALESFORCE_CLIENT_ID)) return new SalesforceProvider();
         if (process.env.CLOSE_API_KEY) return new CloseProvider();
+        if (process.env.FUB_API_KEY) return new FollowUpBossProvider();
       }
       return isSupabaseConfigured() ? new SupabaseProvider() : new BuiltinProvider();
   }
@@ -93,6 +97,9 @@ export async function resolveProvider(): Promise<CrmProvider> {
     const db = by("database");
     if (db && (db.secrets.url || db.config.url)) return new DatabaseProvider();
 
+    const fub = by("followupboss");
+    if (fub?.secrets.apiKey) return new FollowUpBossProvider(fub.secrets.apiKey);
+
     const close = by("close");
     if (close?.secrets.apiKey) return new CloseProvider(close.secrets.apiKey);
 
@@ -121,6 +128,7 @@ export function listIntegrations(): ProviderInfo[] {
       capabilities: { read: true, write: true, activities: true, customFields: true },
       ready: false,
     }),
+    new FollowUpBossProvider().info(),
     new CloseProvider().info(),
     new HubspotProvider().info(),
     new PipedriveProvider().info(),
