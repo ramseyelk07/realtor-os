@@ -31,4 +31,9 @@ grant  execute on function public.current_org_id() to authenticated, service_rol
 --    rls_auto_enable() is a DDL event-trigger helper — never a legitimate API
 --    call. Event triggers still fire under the owner regardless of these
 --    grants, so revoking direct EXECUTE breaks nothing.
-revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
+-- Only exists on projects created with Supabase's "automatic RLS" option.
+do $$ begin
+  if to_regprocedure('public.rls_auto_enable()') is not null then
+    revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
+  end if;
+end $$;
